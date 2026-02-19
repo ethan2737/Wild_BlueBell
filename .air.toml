@@ -1,0 +1,257 @@
+# =============================================================================
+# Air 工具说明文档
+# =============================================================================
+#
+# 【Air 是什么？】
+#   Air (Air-verse) 是一个为 Go 语言设计的热重载（Hot Reload）工具。
+#   它可以监听项目文件的变化，自动重新编译和重启程序，无需手动停止和启动。
+#   类似于 Node.js 的 nodemon，Python 的 watchgod。
+#
+#   官方仓库: https://github.com/air-verse/air
+#   官网: https://air-verse.github.io/air/
+#
+# 【安装步骤】
+#   Windows (PowerShell):
+#     # 方法1: 使用 go install (推荐)
+#     go install github.com/air-verse/air@latest
+#
+#     # 安装后需要将 GOPATH\bin 添加到系统 PATH 环境变量
+#     # 默认 GOPATH 通常是: C:\Users\你的用户名\go\bin
+#
+#   macOS / Linux:
+#     # 方法1: 使用 go install
+#     go install github.com/air-verse/air@latest
+#
+#     # 方法2: 使用 Homebrew (macOS)
+#     brew install air
+#
+#     # 方法3: 下载二进制文件
+#     # 访问 https://github.com/air-verse/air/releases 下载对应平台的压缩包
+#
+# 【使用步骤】
+#   1. 在项目根目录创建配置文件 .air.toml
+#   2. 在终端中进入项目目录
+#   3. 运行 air 命令启动服务
+#      air
+#   4. 修改任意被监听的文件，Air 会自动重新编译和重启
+#
+# 【Windows 注意事项】
+#   1. Go 编译产物需要添加 .exe 扩展名，否则 Windows 无法识别执行
+#      - 错误: go build -o ./tmp/main
+#      - 正确: go build -o ./tmp/main.exe
+#
+#   2. entrypoint 必须使用 ./tmp/main.exe 而不是 ./tmp/main
+#
+#   3. 路径分隔符: Windows 使用反斜杠 (\)，但 TOML 配置中建议使用正斜杠 (/)
+#      或者使用双反斜杠转义: C:\\Project\\wild_bluebell
+#
+#   4. 如果遇到权限问题，请以管理员身份运行终端
+#
+# =============================================================================
+# 文件格式说明
+# =============================================================================
+#
+# TOML 是一种人类可读的配置文件格式 (Tom's Obvious, Minimal Language)
+# 特点: 简单、明确、易于阅读
+#
+# 语法说明:
+#   - # 开头的行是注释
+#   - key = "value" 是键值对
+#   - [section] 定义配置区块
+#   - 数组使用 [item1, item2, item3] 表示
+#
+# =============================================================================
+# 配置详解
+# =============================================================================
+
+# [Air] - 工具标识
+#   方括号 [] 用于定义配置区块 (Section)
+#   TOML = TOML 格式的配置文件
+#   这里的注释说明这是一个 Air 工具的 TOML 格式配置文件
+
+# [root] - 根目录配置
+#   root = "."  # 工作目录，使用 . 表示当前目录
+#   root        - 根目录，Air 会从这个目录开始监听文件变化
+#   "."         - 点号代表当前目录，也可以使用绝对路径如 "E:/Project/B2B/wild_bluebell"
+#
+# tmp_dir = "tmp"  # 临时文件目录
+#   tmp_dir        - 临时目录名称
+#   "tmp"          - 存放编译产出的二进制文件和日志
+#   注意: tmp_dir 必须在 root 目录下
+
+# 工作目录 (root directory)
+# 使用 . 或绝对路径，请注意 `tmp_dir` 目录必须在 `root` 目录下
+root = "."
+# 临时目录 (temporary directory)
+# 存放编译生成的可执行文件和 Air 的日志文件
+tmp_dir = "tmp"
+
+# =============================================================================
+# [build] 构建配置区块
+# =============================================================================
+# build - 构建区块，定义如何编译 Go 程序
+# 这里配置编译命令、可执行文件路径、监听规则等
+
+[build]
+# cmd - 编译命令 (command)
+#   cmd        - 编译命令的配置键
+#   "go build -o ./tmp/main.exe" - 具体的编译指令
+#   go         - Go 语言的编译工具
+#   build      - Go 的子命令，用于编译程序
+#   -o         - 输出标志 (output)，指定编译产物的路径
+#   ./tmp/main.exe - 输出路径和文件名
+#   注意: Windows 平台必须添加 .exe 扩展名
+#
+# 只需要写你平常编译使用的 shell 命令。你也可以使用 `make`
+cmd = "go build -o ./tmp/main.exe"
+
+# entrypoint - 程序入口点 (entry point)
+#   entrypoint    - 程序的入口点，即编译后生成的可执行文件
+#   ["./tmp/main"] - 使用数组格式，指定要运行的程序路径
+#   注意: Windows 下应该是 ["./tmp/main.exe"]
+#   Windows 下需要完整路径: ["E:/Project/B2B/wild_bluebell/tmp/main.exe"]
+entrypoint = ["./tmp/main.exe"]
+
+# args_bin - 命令行参数 (arguments binary)
+#   args_bin     - 传递给可执行文件的命令行参数
+#   ["./conf/config.yaml"] - 配置文件路径作为参数传入
+#   这样程序可以通过 os.Args 获取配置文件路径
+args_bin = ["./conf/config.yaml"]
+
+# include_ext - 包含的扩展名 (include extension)
+#   include_ext - 需要监听的文件扩展名列表
+#   扩展名说明:
+#     - "go"   - Go 源代码文件
+#     - "tpl"  - 模板文件 (template)
+#     - "tmpl" - 模板文件 (template) 的另一种后缀
+#     - "html" - HTML 网页文件
+#     - "yaml" - YAML 配置文件
+# 监听以下文件扩展名的文件.
+include_ext = ["go", "tpl", "tmpl", "html", "yaml"]
+
+# exclude_dir - 排除的目录 (exclude directory)
+#   exclude_dir - 不需要监听的文件目录列表
+#   目录说明:
+#     - "assets"      - 静态资源目录，通常不需要重新编译
+#     - "tmp"         - 临时目录，包含编译产物
+#     - "vendor"      - 依赖包目录 (来自 Go mod vendor)
+#     - "frontend/node_modules" - 前端依赖目录
+# 忽略这些文件扩展名或目录
+exclude_dir = ["assets", "tmp", "vendor", "frontend/node_modules"]
+
+# include_dir - 包含的目录 (include directory)
+#   include_dir - 只监听指定的目录，默认空数组表示监听所有目录
+#   如果设置为非空数组，则只监听这些目录
+# 监听以下指定目录的文件
+include_dir = []
+
+# exclude_file - 排除的文件 (exclude file)
+#   exclude_file - 不需要监听的具体文件列表
+#   可以使用通配符，如 "*.log" 排除所有日志文件
+# 排除以下文件
+exclude_file = []
+
+# delay - 延迟时间 (delay)
+#   delay      - 文件变化后触发重新编译的延迟时间
+#   1000       - 延迟毫秒数 (milliseconds, ms)
+#   "debounce" - 防抖，避免连续的文件变化事件导致频繁编译
+# 如果文件更改过于频繁，则没有必要在每次更改时都触发构建。可以设置触发构建的延迟时间
+delay = 1000 # ms
+
+# stop_on_error - 错误时停止 (stop on error)
+#   stop_on_error - 构建发生错误时是否停止运行旧的二进制文件
+#   true         - 是，停止运行旧程序
+#   false        - 否，继续运行旧程序
+# 发生构建错误时，停止运行旧的二进制文件。
+stop_on_error = true
+
+# log - 日志文件名 (log)
+#   log         - Air 的错误日志文件名
+#   "air_errors.log" - 日志文件名称
+#   该日志文件放置在 tmp_dir 目录中
+# air的日志文件名，该日志文件放置在你的 `tmp_dir` 中
+log = "air_errors.log"
+
+# =============================================================================
+# [log] 日志配置区块
+# =============================================================================
+# log - 日志配置
+# 这里配置 Air 自身的日志输出格式
+
+[log]
+# time - 时间戳 (time)
+#   time       - 是否在日志中显示时间
+#   true       - 是，显示时间
+#   false      - 否，不显示时间
+# 显示日志时间
+time = true
+
+# =============================================================================
+# [color] 颜色配置区块
+# =============================================================================
+# color - 颜色配置
+# 自定义终端输出各部分显示的颜色，便于区分不同类型的信息
+
+[color]
+# main - 主颜色 (main)
+#   main      - 主要信息的颜色，如状态信息
+#   "magenta" - 品红色 (紫红色)
+# 自定义每个部分显示的颜色。如果找不到颜色，使用原始的应用程序日志。
+main = "magenta"
+
+# watcher - 监听器颜色 (watcher)
+#   watcher   - 文件监听相关信息的颜色
+#   "cyan"    - 青色 (蓝绿色)
+watcher = "cyan"
+
+# build - 构建颜色 (build)
+#   build     - 构建过程信息的颜色
+#   "yellow"  - 黄色
+build = "yellow"
+
+# runner - 运行器颜色 (runner)
+#   runner    - 程序运行相关信息的颜色
+#   "green"   - 绿色
+runner = "green"
+
+# =============================================================================
+# [misc] 杂项配置区块
+# =============================================================================
+# misc - 杂项 Miscellaneous
+# 包含一些其他配置选项
+
+[misc]
+# clean_on_exit - 退出时清理 (clean on exit)
+#   clean_on_exit - 程序退出时是否清理临时目录
+#   true          - 是，删除 tmp_dir 目录
+#   false         - 否，保留临时文件
+# 退出时删除 tmp 目录
+clean_on_exit = true
+
+# =============================================================================
+# 常用英文单词解释
+# =============================================================================
+#
+# root        - 根，根目录，项目的基础目录
+# tmp / temp  - 临时 (temporary)，临时文件或目录
+# build       - 构建，将源代码编译成可执行程序的过程
+# cmd / command - 命令，要执行的指令
+# entrypoint  - 入口点，程序开始执行的地方
+# args / arguments - 参数，传递给程序的数据
+# bin / binary - 二进制，可执行文件
+# include     - 包含，需要包含或监听的内容
+# exclude     - 排除，不需要包含或监听的内容
+# ext / extension - 扩展名，文件的类型标识
+# dir / directory - 目录，文件夹
+# file        - 文件
+# delay       - 延迟，延迟执行的时间
+# stop        - 停止，终止程序运行
+# error       - 错误，程序运行中的问题
+# log         - 日志，记录程序运行信息的文件
+# time        - 时间，时间戳
+# color       - 颜色，终端输出的颜色
+# watcher     - 监听器，监控文件变化的组件
+# runner      - 运行器，运行程序的组件
+# misc / miscellaneous - 杂项，其他配置
+# exit        - 退出，结束程序运行
+# clean       - 清理，删除不需要的文件

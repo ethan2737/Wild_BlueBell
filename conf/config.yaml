@@ -1,0 +1,45 @@
+# config.yaml 配置文件一般包含如下内容
+# 应用基础信息：名称、运行模式、端口、版本等
+# 数据库配置：MySQL、Redis等
+# 缓存配置：Redis、Memcached等
+# 日志配置：级别，输出路径，轮转策略等
+# 认证信息：jwt、auth、密钥等
+# 中间件配置：CORS、限流、压缩等
+# 第三方服务：阿里云、AWS、短信网关等
+# 环境变量覆盖：支持不同环境切换
+
+# 应用基础信息
+name: "wild_bluebell"     # 应用名称
+mode: "dev"           # 运行模式：debug/release/dev
+port: 8080                # 服务监听端口
+version: "v0.0.1"         # 版本号
+start_time: "2026-02-08"  # 启动时间
+machine_id: 1             # 雪花算法机器ID（用于分布式ID生成）
+
+# 2. 认证配置
+auth:
+  jwt_expire: 8760        # JWT过期时间（小时，8760=1年）
+
+# 3. 日志配置
+log:
+  level: "debug"           # 日志级别：debug / info / warn / error
+  filename: "web_app.log" # 日志文件路径
+  max_size: 200           # 单文件最大200MB
+  max_backups: 7          # 保留7个备份
+
+# 4. MySQL 数据库配置
+mysql:
+  host: "127.0.0.1"
+  port: 13306
+  user: "root"
+  password: "123456"
+  dbname: "wild_bluebell"
+  max_open_conns: 200     # 最大连接数
+  max_idle_conns: 50      # 空闲连接池大小
+
+redis:
+  host: "127.0.0.1"
+  port: 16379
+  password: ""            # 密码（空）
+  db: 2                   # 数据库编号
+  pool_size: 100          # 连接池大小
