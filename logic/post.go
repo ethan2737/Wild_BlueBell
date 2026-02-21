@@ -3,6 +3,7 @@ package logic
 import (
 	"go.uber.org/zap"
 	"wild_bluebell/dao/mysql"
+	"wild_bluebell/dao/redis"
 	"wild_bluebell/models"
 	"wild_bluebell/pkg/snowflake"
 )
@@ -12,7 +13,12 @@ func CreatePost(p *models.Post) (err error) {
 	// 1. 生成post ID
 	p.ID = snowflake.GenID()
 	// 2. 保存到数据库
-	return mysql.CreatePost(p)
+	err = mysql.CreatePost(p)
+	if err != nil {
+		return err
+	}
+	err = redis.CreatePost(p.ID)
+	return
 	// 3. 返回
 }
 

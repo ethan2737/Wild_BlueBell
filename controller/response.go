@@ -20,7 +20,7 @@ type ResponseData struct {
 	Code ResCode `json:"code"`
 	// 提示信息和数据，因为不确定是什么类型，所以使用接口
 	Msg  interface{} `json:"msg"`
-	Data interface{} `json:"data"`
+	Data interface{} `json:"data,omitempty"`
 }
 
 // ResponseError 返回错误
