@@ -16,11 +16,11 @@ import (
 */
 
 // ResponseData 定义返回响应的结构体
+// @Description 统一响应结构体
 type ResponseData struct {
-	Code ResCode `json:"code"`
-	// 提示信息和数据，因为不确定是什么类型，所以使用接口
-	Msg  interface{} `json:"msg"`
-	Data interface{} `json:"data,omitempty"`
+	Code ResCode     `json:"code" example:"1000"`   // 状态码
+	Msg  string      `json:"msg" example:"Success"` // 提示信息
+	Data interface{} `json:"data,omitempty"`        // 数据
 }
 
 // ResponseError 返回错误
@@ -33,7 +33,7 @@ func ResponseError(c *gin.Context, code ResCode) {
 }
 
 // ResponseErrorWithMsg 返回错误信息内容
-func ResponseErrorWithMsg(c *gin.Context, code ResCode, msg interface{}) {
+func ResponseErrorWithMsg(c *gin.Context, code ResCode, msg string) {
 	c.JSON(http.StatusOK, &ResponseData{
 		Code: code,
 		Msg:  msg,

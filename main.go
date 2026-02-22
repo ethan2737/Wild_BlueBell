@@ -10,7 +10,29 @@ import (
 	"wild_bluebell/pkg/snowflake"
 	"wild_bluebell/router"
 	"wild_bluebell/setting"
+
+	_ "wild_bluebell/docs" // 导入 swagger docs
 )
+
+// @title           wild_Bluebell 社区论坛 API
+// @version         1.0
+// @description     wild_Bluebell 社区论坛系统 API 文档
+// @termsOfService  http://swagger.io/terms/
+
+// @contact.name   API Support
+// @contact.url    http://www.swagger.io/support
+// @contact.email  support@swagger.io
+
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host      localhost:8080
+// @BasePath  /api/v1
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description 请输入 JWT token，格式为：Bearer <token>
 
 func main() {
 	// 命令行参数检查，确保用户启动程序时提供了配置文件路径
