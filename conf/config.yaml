@@ -11,7 +11,7 @@
 # 应用基础信息
 name: "wild_bluebell"     # 应用名称
 mode: "dev"           # 运行模式：debug/release/dev
-port: 8080                # 服务监听端口
+port: 9090                # 服务监听端口
 version: "v0.0.1"         # 版本号
 start_time: "2026-02-08"  # 启动时间
 machine_id: 1             # 雪花算法机器ID（用于分布式ID生成）

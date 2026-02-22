@@ -3,6 +3,7 @@ package router
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"time"
 	"wild_bluebell/controller"
 	"wild_bluebell/logger"
 	"wild_bluebell/middlewares"
@@ -16,7 +17,7 @@ import (
 // SetupRouter 路由
 func SetupRouter(mode string) *gin.Engine {
 	r := gin.New()
-	r.Use(logger.GinLogger(), logger.GinRecovery(true))
+	r.Use(logger.GinLogger(), logger.GinRecovery(true), middlewares.RateLimitMiddleware(2*time.Second, 1)) // 全局限流，每2秒发放一个令牌
 
 	// 注册 swagger 路由
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
